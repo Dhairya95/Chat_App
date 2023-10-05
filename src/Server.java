@@ -4,10 +4,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-
+import java.util.ArrayList;
 
 
 public class Server {
+    public ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
     private ServerSocket serverSocket;
     private Socket socket;
 
@@ -43,7 +44,8 @@ public class Server {
             while(!serverSocket.isClosed())
             {
                 this.socket = serverSocket.accept();
-                ClientHandler clientHandler = new ClientHandler(socket);
+                ClientHandler clientHandler = new ClientHandler(socket,clientHandlers);
+                this.clientHandlers.add(clientHandler);
                 System.out.println("User "+clientHandler.getUserName() + " Connected");
                 Thread thread = new Thread(clientHandler);
                 thread.start();

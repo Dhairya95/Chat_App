@@ -2,43 +2,35 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Client implements Runnable{
+public class Client implements Runnable {
     private Socket socket;
     private DataOutputStream dataOutputStream;
     private DataInputStream dataInputStream;
     private String name;
 
-    public Client(Socket socket, String name)
-    {
-        try
-        {
+    public Client(Socket socket, String name) {
+        try {
             this.socket = socket;
             this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
             this.dataInputStream = new DataInputStream(socket.getInputStream());
             this.name = name;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             closeAll(socket, dataOutputStream, dataInputStream);
         }
     }
 
-    public void sendMessage()
-    {
-        try{
+    public void sendMessage() {
+        try {
             dataOutputStream.writeUTF(name);
             dataOutputStream.flush();
             Scanner sc = new Scanner(System.in);
 
-            while(socket.isConnected())
-            {
+            while (socket.isConnected()) {
                 String messageToSend = sc.nextLine();
                 dataOutputStream.writeUTF(name + ": " + messageToSend);
                 dataOutputStream.flush();
             }
-        }
-        catch(IOException e)
-        {
+        } catch (IOException e) {
             closeAll(socket, dataOutputStream, dataInputStream);
 
         }
@@ -46,19 +38,14 @@ public class Client implements Runnable{
 
 
     @Override
-    public void run()
-    {
+    public void run() {
         String messageFromChat;
 
-        while(socket.isConnected())
-        {
-            try
-            {
-                messageFromChat =  dataInputStream.readUTF();
+        while (socket.isConnected()) {
+            try {
+                messageFromChat = dataInputStream.readUTF();
                 System.out.println(messageFromChat);
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 closeAll(socket, dataOutputStream, dataInputStream);
             }
 
@@ -66,39 +53,30 @@ public class Client implements Runnable{
 
     }
 
-    public void readMessage(Client client)
-    {
+    public void readMessage(Client client) {
         Runnable runnable = client;
         Thread thread = new Thread(runnable);
         thread.start();
     }
 
-    public void closeAll(Socket socket, DataOutputStream dataOutputStream, DataInputStream dataInputStream)
-    {
-        try
-        {
-            if(dataOutputStream!= null)
-            {
+    public void closeAll(Socket socket, DataOutputStream dataOutputStream, DataInputStream dataInputStream) {
+        try {
+            if (dataOutputStream != null) {
                 dataOutputStream.close();
             }
-            if(dataInputStream != null)
-            {
+            if (dataInputStream != null) {
                 dataInputStream.close();
             }
-            if(socket != null)
-            {
+            if (socket != null) {
                 socket.close();
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.out.println(e);
         }
     }
 
     // main method
-    public static void main(String[] args) throws IOException
-    {
+    public static void main(String[] args) throws IOException {
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter your name");
         String name = sc.nextLine();
